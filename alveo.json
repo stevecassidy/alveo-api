@@ -23,13 +23,10 @@
                         "description": "The API Version information",
                         "schema": {
                             "type": "object",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "API Version": {
-                                        "type": "string",
-                                        "description": "Version identifier for the API. This will  normally be a version number such as V2.1 that will be  incremented with each new release"
-                                    }
+                            "properties": {
+                                "API Version": {
+                                    "type": "string",
+                                    "description": "Version identifier for the API. This will  normally be a version number such as V2.1 that will be  incremented with each new release"
                                 }
                             }
                         }
@@ -40,7 +37,7 @@
         "/item_lists": {
             "get": {
                 "summary": "Item Lists of the user",
-                "description": "Get the item list for this user.",
+                "description": "Get the item lists for the authenticated user.",
                 "parameters": [
                     {
                         "name": "X-API-KEY",
