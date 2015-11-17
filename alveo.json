@@ -13,11 +13,26 @@
     "produces": [
         "application/json"
     ],
+    "tags": [
+            {
+            "name": "items",
+            "description": "Items and Item Lists"
+            },
+            {
+            "name": "general",
+            "description": "General Operations"
+            },
+            {
+            "name": "create",
+            "description": "Creating Things"
+            }
+    ],
     "paths": {
         "/version": {
             "get": {
                 "summary": "API Version",
                 "description": "The version string for the API.",
+                "tags": ["general"],
                 "responses": {
                     "200": {
                         "description": "The API Version information",
@@ -36,6 +51,7 @@
         },
         "/item_lists": {
             "get": {
+                "tags": ["items"],
                 "summary": "Item Lists of the user",
                 "description": "Get the item lists for the authenticated user.",
                 "parameters": [
@@ -60,8 +76,9 @@
                 }
             },
             "post": {
+                "tags": ["create"],
                 "summary": "Create an item list",
-                "description": "Create a new item list containing a set of items",
+                "description": "Create a new item list containing a set of items. Response is a JSON object containing a success or error message",
                 "parameters": [
                     {
                         "name": "X-API-KEY",
@@ -76,7 +93,7 @@
                         "description": "JSON specification of item list",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ItemList"
+                            "$ref": "#/definitions/ItemListQ"
                         }
                     }
                 ],
@@ -84,15 +101,58 @@
                     "200": {
                         "description": "A list of item list descriptions",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/ItemInfo"
+                            "type": "object",
+                            "properties": {
+                                "success": {
+                                    "type": "string",
+                                    "description": "eg. '2 items added to existing item list A'",
+                                    "required": false
+                                },
+                                "error": {
+                                    "type": "string",
+                                    "description": "eg. 'name parameter not found'",
+                                    "required": false
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/item_lists/{id}": {
+            "get": {
+                "tags": ["items"],
+                "summary": "Get the contents of an item list",
+                "parameters": [
+                    {
+                        "name": "X-API-KEY",
+                        "in": "header",
+                        "description": "user API Key",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "the item list identifier",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "An item list",
+                        "schema": {
+                            "type": "object",
+                            "schema": {
+                                "$ref": "#/definitions/ItemList"
                             }
                         }
                     }
                 }
             }
         }
+
     },
     "definitions": {
         "ItemInfo": {
@@ -112,7 +172,7 @@
                 }
             }
         },
-        "ItemList": {
+        "ItemListQ": {
             "type": "object",
             "properties": {
                 "items": {
@@ -132,7 +192,27 @@
                 }
 
             }
+        },
+        "ItemList": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "description": "Item URL"
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Name of the item list to create - must be provided here or in the query string"
+                },
+                "num_items": {
+                    "type": "integer",
+                    "description": "size of the item list"
+                }
 
+            }
         }
     }
 }
