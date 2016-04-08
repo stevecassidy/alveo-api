@@ -241,6 +241,92 @@
                     }
                 }
             }
+            "post": {
+                "tags": ["create"],
+                "summary": "add annotations to an item",
+                "description": "add new annotations to an item using a JSON-LD format",
+                "parameters": [
+                    {
+                        "name": "X-API-KEY",
+                        "in": "header",
+                        "description": "user API Key",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "collection_name",
+                        "in": "path",
+                        "description": "collection name",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "item_id",
+                        "in": "path",
+                        "description": "the item identifier",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "annotations",
+                        "in": "body",
+                        "description": "annotation data as JSON-LD",
+                        "required": true,
+                        "type": "object",
+                        "properties": {
+                            "@context": {
+                                "type": "string",
+                                "description": "the JSON-LD context"
+                            },
+                            "@graph": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "@type": {
+                                                "type": "string",
+                                                "description": "annotation type identifier",
+                                                "enum": ["dada:TextAnnotation", "dada:SecondAnnotation"]
+                                        },
+                                        "label": {
+                                            "type": "string",
+                                            "description": "the annotation label"
+                                        },
+                                        "start": {
+                                            "type": "string",
+                                            "description": "annotation start (characters or seconds)"
+                                        },
+                                        "end": {
+                                            "type": "string",
+                                            "description": "annotation end (characters or seconds)"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success/error message",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "success": {
+                                    "type": "string",
+                                    "description": "success message",
+                                    "required": false
+                                },
+                                "error": {
+                                    "type": "string",
+                                    "description": "error message",
+                                    "required": false
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
