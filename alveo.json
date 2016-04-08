@@ -240,7 +240,7 @@
                         }
                     }
                 }
-            }
+            },
             "post": {
                 "tags": ["create"],
                 "summary": "add annotations to an item",
