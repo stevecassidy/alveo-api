@@ -105,11 +105,11 @@
                             "properties": {
                                 "success": {
                                     "type": "string",
-                                    "description": "eg. '2 items added to existing item list A'",
+                                    "description": "eg. '2 items added to existing item list A'"
                                 },
                                 "error": {
                                     "type": "string",
-                                    "description": "eg. 'name parameter not found'",
+                                    "description": "eg. 'name parameter not found'"
                                 }
                             }
                         }
@@ -141,10 +141,7 @@
                     "200": {
                         "description": "An item list",
                         "schema": {
-                            "type": "object",
-                            "schema": {
-                                "$ref": "#/definitions/ItemList"
-                            }
+                            "$ref": "#/definitions/ItemList"
                         }
                     }
                 }
@@ -270,7 +267,6 @@
                         "in": "body",
                         "description": "annotation data as JSON-LD",
                         "required": true,
-                        "type": "object",
                         "schema": {
                             "$ref": "#/definitions/JSON-LD-Graph"
                         }
@@ -284,11 +280,119 @@
                             "properties": {
                                 "success": {
                                     "type": "string",
-                                    "description": "success message",
+                                    "description": "success message"
                                 },
                                 "error": {
                                     "type": "string",
-                                    "description": "error message",
+                                    "description": "error message"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/catalog/{collection_name}/{item_id}/annotations/properties": {
+            "get": {
+                "tags": ["items"],
+                "summary": "Get the annotation properties for an item",
+                "parameters": [
+                    {
+                        "name": "X-API-KEY",
+                        "in": "header",
+                        "description": "user API Key",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "collection_name",
+                        "in": "path",
+                        "description": "collection name",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "item_id",
+                        "in": "path",
+                        "description": "the item identifier",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "a list of the annotation property URIs and their shortened (namespaced) versions",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "item_url": {
+                                    "type": "string",
+                                    "description": "the URL of the item these properties refer to"
+                                },
+                                "annotation_properties": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "uri": {
+                                                "type": "string",
+                                                "description": "full property URI as used in RDF triple store"
+                                            },
+                                            "shortened_uri": {
+                                                    "type": "string",
+                                                    "description": "namespaced version of the uri, eg. ausnc:speakerid"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/catalog/{collection_name}/{item_id}/annotations/types": {
+            "get": {
+                "tags": ["items"],
+                "summary": "Get the annotation types for an item",
+                "parameters": [
+                    {
+                        "name": "X-API-KEY",
+                        "in": "header",
+                        "description": "user API Key",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "collection_name",
+                        "in": "path",
+                        "description": "collection name",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "item_id",
+                        "in": "path",
+                        "description": "the item identifier",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "a list of the annotation type URIs available for this item",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "item_url": {
+                                    "type": "string",
+                                    "description": "the URL of the item these properties refer to"
+                                },
+                                "annotation_types": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
                                 }
                             }
                         }
