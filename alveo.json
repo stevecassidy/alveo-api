@@ -106,12 +106,10 @@
                                 "success": {
                                     "type": "string",
                                     "description": "eg. '2 items added to existing item list A'",
-                                    "required": false
                                 },
                                 "error": {
                                     "type": "string",
                                     "description": "eg. 'name parameter not found'",
-                                    "required": false
                                 }
                             }
                         }
@@ -273,38 +271,10 @@
                         "description": "annotation data as JSON-LD",
                         "required": true,
                         "type": "object",
-                        "properties": {
-                            "@context": {
-                                "type": "string",
-                                "description": "the JSON-LD context"
-                            },
-                            "@graph": {
-                                "type": "array",
-                                "items": {
-                                    "type": "object",
-                                    "properties": {
-                                        "@type": {
-                                                "type": "string",
-                                                "description": "annotation type identifier",
-                                                "enum": ["dada:TextAnnotation", "dada:SecondAnnotation"]
-                                        },
-                                        "label": {
-                                            "type": "string",
-                                            "description": "the annotation label"
-                                        },
-                                        "start": {
-                                            "type": "string",
-                                            "description": "annotation start (characters or seconds)"
-                                        },
-                                        "end": {
-                                            "type": "string",
-                                            "description": "annotation end (characters or seconds)"
-                                        }
-                                    }
-                                }
-                            }
+                        "schema": {
+                            "$ref": "#/definitions/JSON-LD-Graph"
                         }
-                    },
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -315,12 +285,10 @@
                                 "success": {
                                     "type": "string",
                                     "description": "success message",
-                                    "required": false
                                 },
                                 "error": {
                                     "type": "string",
                                     "description": "error message",
-                                    "required": false
                                 }
                             }
                         }
@@ -330,6 +298,40 @@
         }
     },
     "definitions": {
+        "JSON-LD-Graph": {
+            "type": "object",
+            "properties": {
+                "@context": {
+                    "type": "string",
+                    "description": "the JSON-LD context"
+                },
+                "@graph": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "@type": {
+                                    "type": "string",
+                                    "description": "annotation type identifier",
+                                    "enum": ["dada:TextAnnotation", "dada:SecondAnnotation"]
+                            },
+                            "label": {
+                                "type": "string",
+                                "description": "the annotation label"
+                            },
+                            "start": {
+                                "type": "string",
+                                "description": "annotation start (characters or seconds)"
+                            },
+                            "end": {
+                                "type": "string",
+                                "description": "annotation end (characters or seconds)"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "ItemInfo": {
             "type": "object",
             "properties": {
