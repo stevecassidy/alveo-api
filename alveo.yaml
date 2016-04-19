@@ -1,8 +1,8 @@
 swagger: '2.0'
 info:
   title: Alveo API
-  description: The Virtual Laboratory for Human Communication Science
-  version: 1.0.0
+  description: Documentation for the HTTP API for the Alveo Virtual Laboratory
+  version: 3.2.2
 host: app.alveo.edu.au
 schemes:
   - https
