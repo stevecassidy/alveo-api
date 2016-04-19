@@ -1,0 +1,745 @@
+swagger: '2.0'
+info:
+  title: Alveo API
+  description: The Virtual Laboratory for Human Communication Science
+  version: 1.0.0
+host: app.alveo.edu.au
+schemes:
+  - https
+basePath: /
+produces:
+  - application/json
+tags:
+  - name: itemlist
+    description: Operations on Item Lists
+  - name: items
+    description: Operations on Items
+  - name: general
+    description: General Operations
+paths:
+  /version:
+    get:
+      summary: API Version
+      description: The version string for the API.
+      tags:
+        - general
+      responses:
+        '200':
+          description: The API Version information
+          schema:
+            type: object
+            properties:
+              API Version:
+                type: string
+                description: Version identifier for the API. This will  normally be a version number such as V2.1 that will be  incremented with each new release
+  '/schema/json-ld':
+      get:
+          summary: Get the JSON-LD schema
+          description: The global JSON-LD schema for the Alveo application containing all namespace prefix definitions
+          tags:
+              - general
+          produces:
+              - application/json
+          responses:
+              '200':
+                  description: JSON-LD schema
+  /licences:
+      get:
+          tags:
+              - general
+          summary: Get a list of licences available to the system
+      parameters:
+        - name: X-API-KEY
+          in: header
+          description: user API Key
+          required: true
+          type: string
+      responses:
+        '200':
+          description: A list of licences available
+          schema:
+              type: object
+              properties:
+                  name:
+                    description: licence name
+                    type: string
+                  id:
+                    description: item lists shared by other users
+                    type: string
+
+  /item_lists:
+    get:
+      tags:
+        - itemlist
+      summary: Item Lists of the user
+      description: Get the item lists for the authenticated user.
+      parameters:
+        - name: X-API-KEY
+          in: header
+          description: user API Key
+          required: true
+          type: string
+      responses:
+        '200':
+          description: A list of item list descriptions
+          schema:
+              type: object
+              properties:
+                  own:
+                    description: item lists owned by the user
+                    type: array
+                    items:
+                      $ref: '#/definitions/ItemInfo'
+                  shared:
+                    description: item lists shared by other users
+                    type: array
+                    items:
+                      $ref: '#/definitions/ItemInfo'
+        '401':
+            description: Authorisation error
+            schema:
+                type: object
+                properties:
+                    error:
+                        type: string
+    post:
+      tags:
+        - itemlist
+      summary: Create an item list
+      description: Create a new item list containing a set of items. Response is a JSON object containing a success or error message
+      parameters:
+        - name: X-API-KEY
+          in: header
+          description: user API Key
+          required: true
+          type: string
+        - name: itemlist
+          in: body
+          description: JSON specification of item list
+          required: true
+          schema:
+            $ref: '#/definitions/ItemListQ'
+      responses:
+        '200':
+          description: A list of item list descriptions
+          schema:
+            type: object
+            properties:
+              success:
+                type: string
+                description: "eg. '2 items added to existing item list A'"
+              error:
+                type: string
+                description: "eg. 'name parameter not found'"
+  '/item_lists/{id}':
+    get:
+      tags:
+        - itemlist
+      summary: Get the contents of an item list
+      parameters:
+        - name: X-API-KEY
+          in: header
+          description: user API Key
+          required: true
+          type: string
+        - name: id
+          in: path
+          description: the item list identifier
+          required: true
+          type: string
+      responses:
+        '200':
+          description: An item list
+          schema:
+            $ref: '#/definitions/ItemList'
+        '404':
+            description: Not found
+            schema:
+                $ref: '#/definitions/NotFound'
+    delete:
+        tags:
+            - itemlist
+        summary: Delete an item list
+        parameters:
+            - name: X-API-KEY
+              in: header
+              description: user API Key
+              required: true
+              type: string
+            - name: id
+              in: path
+              description: the item list identifier
+              required: true
+              type: string
+        responses:
+            '200':
+                description: Success/failure message
+                schema:
+                    type: object
+                    properties:
+                      success:
+                        type: string
+                        description: eg. 'item list deleted successfully'
+                      error:
+                        type: string
+                        description: eg. 'name parameter not found'
+            '404':
+                description: Not found
+                schema:
+                    $ref: '#/definitions/NotFound'
+    put:
+        tags:
+            - itemlist
+        summary: rename an item list
+        parameters:
+            - name: X-API-KEY
+              in: header
+              description: user API Key
+              required: true
+              type: string
+            - name: id
+              in: path
+              description: the item list identifier
+              required: true
+              type: string
+            - name: name
+              in: body
+              schema:
+                  type: object
+                  properties:
+                      name:
+                          type: string
+        responses:
+            '200':
+                description: Success/failure message
+                schema:
+                    '$ref': '#/definitions/ItemList'
+            '400':
+                description: Error responses
+                schema:
+                    '$ref': '#/definitions/ErrorResponse'
+            '404':
+                description: Not found
+                schema:
+                    $ref: '#/definitions/ErrorResponse'
+  '/item_lists/{id}/share':
+    post:
+      tags:
+        - itemlist
+      summary: Share an item list
+      parameters:
+        - name: X-API-KEY
+          in: header
+          description: user API Key
+          required: true
+          type: string
+        - name: id
+          in: path
+          description: the item list identifier
+          required: true
+          type: string
+      responses:
+        '200':
+            description: Success/failure message
+            schema:
+                type: object
+                properties:
+                  success:
+                    type: string
+                  error:
+                    type: string
+        '404':
+            description: Not found
+            schema:
+                $ref: '#/definitions/NotFound'
+  '/item_lists/{id}/unshare':
+    post:
+      tags:
+        - itemlist
+      summary: Stop sharing an item list
+      parameters:
+        - name: X-API-KEY
+          in: header
+          description: user API Key
+          required: true
+          type: string
+        - name: id
+          in: path
+          description: the item list identifier
+          required: true
+          type: string
+      responses:
+        '200':
+            description: Success/failure message
+            schema:
+                type: object
+                properties:
+                  success:
+                    type: string
+                  error:
+                    type: string
+        '404':
+            description: Not found
+            schema:
+                $ref: '#/definitions/NotFound'
+  '/item_lists/{id}/clear':
+    post:
+      tags:
+        - itemlist
+      summary: Clear the contents of an item list
+      parameters:
+        - name: X-API-KEY
+          in: header
+          description: user API Key
+          required: true
+          type: string
+        - name: id
+          in: path
+          description: the item list identifier
+          required: true
+          type: string
+      responses:
+        '200':
+            description: Success/failure message
+            schema:
+                type: object
+                properties:
+                  success:
+                    type: string
+                  error:
+                    type: string
+        '404':
+            description: Not found
+            schema:
+                $ref: '#/definitions/NotFound'
+  '/item_lists/{id}/aspera_transfer_spec':
+      post:
+          summary: get the transfer spec to download this item list using Aspera Connect
+  '/catalog':
+      get:
+          summary: get a list of collections
+      post:
+          summary: create a new collection
+  '/catalog/{collection_name}':
+      get:
+          summary: get the metadata for a collection
+      post:
+          summary: add items with documents to a collection
+      put:
+          summary: update the metadata for a collection
+  '/catalog/search':
+      get:
+          summary: search all collections for items using metadata properties
+  '/catalog/{collection_name}/{item_id}':
+      put:
+         summary: update the metadata for an item
+      delete:
+         summary: delete an item
+      post:
+         summary: add a document to an item
+      get:
+          tags:
+              - items
+          summary: Get item metadata
+          parameters:
+            - name: X-API-KEY
+              in: header
+              description: user API Key
+              required: true
+              type: string
+            - name: collection_name
+              in: path
+              description: collection name
+              required: true
+              type: string
+            - name: item_id
+              in: path
+              description: the item identifier
+              required: true
+              type: string
+          responses:
+              '200':
+                  description: Item metadata
+                  schema:
+                      $ref: '#/definitions/ItemMetadata'
+
+  '/catalog/{collection_name}/{item_id}/document/{doc_id}':
+      delete:
+          summary: delete a document from an item
+      get:
+          tags:
+              - items
+          summary: Get a document associated with an item
+          parameters:
+            - name: X-API-KEY
+              in: header
+              description: user API Key
+              required: true
+              type: string
+            - name: collection_name
+              in: path
+              description: collection name
+              required: true
+              type: string
+            - name: item_id
+              in: path
+              description: the item identifier
+              required: true
+              type: string
+            - name: doc_id
+              in: path
+              description: the document identifier
+              required: true
+              type: string
+          responses:
+              '200':
+                  description: the document
+  '/catalog/{collection_name}/{item_id}/primary_text':
+      get:
+          tags:
+              - items
+          summary: Get contents of the primary text for an item
+          produces:
+              - text/plain
+          parameters:
+            - name: X-API-KEY
+              in: header
+              description: user API Key
+              required: true
+              type: string
+            - name: collection_name
+              in: path
+              description: collection name
+              required: true
+              type: string
+            - name: item_id
+              in: path
+              description: the item identifier
+              required: true
+              type: string
+          responses:
+              '200':
+                  description: item primary text
+  '/catalog/{collection_name}/{item_id}/annotations':
+    get:
+      tags:
+        - items
+      summary: Get the annotations on an item
+      parameters:
+        - name: X-API-KEY
+          in: header
+          description: user API Key
+          required: true
+          type: string
+        - name: collection_name
+          in: path
+          description: collection name
+          required: true
+          type: string
+        - name: item_id
+          in: path
+          description: the item identifier
+          required: true
+          type: string
+        - name: type
+          in: query
+          description: restrict results to annotations of this type
+          required: false
+          type: string
+        - name: label
+          in: query
+          description: restrict results to annotations with this label
+          required: false
+          type: string
+      responses:
+        '200':
+          description: a query result
+          schema:
+            type: object
+            properties:
+              '@context':
+                type: string
+                description: the JSON-LD context
+              commonProperties:
+                type: object
+                description: metadata properties common to all annotations
+              'alveo:annotations':
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@id':
+                      type: string
+                      description: annotation URL
+                    '@type':
+                      type: string
+                      description: annotation type identifier
+                      enum:
+                        - 'dada:TextAnnotation'
+                        - 'dada:SecondAnnotation'
+                    label:
+                      type: string
+                      description: the annotation label
+                    start:
+                      type: string
+                      description: annotation start (characters or seconds)
+                    end:
+                      type: string
+                      description: annotation end (characters or seconds)
+    post:
+      tags:
+        - items
+      summary: add annotations to an item
+      description: add new annotations to an item using a JSON-LD format
+      parameters:
+        - name: X-API-KEY
+          in: header
+          description: user API Key
+          required: true
+          type: string
+        - name: collection_name
+          in: path
+          description: collection name
+          required: true
+          type: string
+        - name: item_id
+          in: path
+          description: the item identifier
+          required: true
+          type: string
+        - name: annotations
+          in: body
+          description: annotation data as JSON-LD
+          required: true
+          schema:
+            $ref: '#/definitions/JSON-LD-Graph'
+      responses:
+        '200':
+          description: success/error message
+          schema:
+            type: object
+            properties:
+              success:
+                type: string
+                description: success message
+              error:
+                type: string
+                description: error message
+  '/catalog/{collection_name}/{item_id}/annotations/properties':
+    get:
+      tags:
+        - items
+      summary: Get the annotation properties for an item
+      parameters:
+        - name: X-API-KEY
+          in: header
+          description: user API Key
+          required: true
+          type: string
+        - name: collection_name
+          in: path
+          description: collection name
+          required: true
+          type: string
+        - name: item_id
+          in: path
+          description: the item identifier
+          required: true
+          type: string
+      responses:
+        '200':
+          description: a list of the annotation property URIs and their shortened (namespaced) versions
+          schema:
+            type: object
+            properties:
+              item_url:
+                type: string
+                description: the URL of the item these properties refer to
+              annotation_properties:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    uri:
+                      type: string
+                      description: full property URI as used in RDF triple store
+                    shortened_uri:
+                      type: string
+                      description: 'namespaced version of the uri, eg. ausnc:speakerid'
+  '/catalog/{collection_name}/{item_id}/annotations/types':
+    get:
+      tags:
+        - items
+      summary: Get the annotation types for an item
+      parameters:
+        - name: X-API-KEY
+          in: header
+          description: user API Key
+          required: true
+          type: string
+        - name: collection_name
+          in: path
+          description: collection name
+          required: true
+          type: string
+        - name: item_id
+          in: path
+          description: the item identifier
+          required: true
+          type: string
+      responses:
+        '200':
+          description: a list of the annotation type URIs available for this item
+          schema:
+            type: object
+            properties:
+              item_url:
+                type: string
+                description: the URL of the item these properties refer to
+              annotation_types:
+                type: array
+                items:
+                  type: string
+  '/catalog/download_items':
+      'post':
+          summary: download item documents and metadata
+definitions:
+  NotFound:
+      type: object
+      properties:
+          error:
+              type: string
+  ErrorResponse:
+    type: object
+    properties:
+      error:
+        type: string
+        description: error message
+  JSON-LD-Graph:
+    type: object
+    properties:
+      '@context':
+        type: string
+        description: the JSON-LD context
+      '@graph':
+        type: array
+        items:
+          type: object
+          properties:
+            '@type':
+              type: string
+              description: annotation type identifier
+              enum:
+                - 'dada:TextAnnotation'
+                - 'dada:SecondAnnotation'
+            label:
+              type: string
+              description: the annotation label
+            start:
+              type: string
+              description: annotation start (characters or seconds)
+            end:
+              type: string
+              description: annotation end (characters or seconds)
+  ItemMetadata:
+    type: object
+    properties:
+        '@context':
+            type: string
+            description: the JSON-LD context
+        'alveo:catalog_url':
+          type: string
+          description: URL of the item
+        'alveo:metadata':
+          type: object
+          description: metadata properties for the item
+          schema:
+              type: object
+              properties:
+                'dc:identifier':
+                    type: string
+                    description: the item identifier, eg. '1-194'
+                'dc:created':
+                    type: string
+                    description: the creation date of the documents in the item
+                'alveo:display_document':
+                    type: string
+                    description: the identifier of the document that should be displayed for this item
+                'alveo:indexable_document':
+                    type: string
+                    description: the identifier of a document that can be indexed for full text search
+                'alveo:full_text':
+                    type: string
+                    description: the full text of the primary document (if available)
+        'alveo:primary_text_url':
+          type: string
+          description: URL to access the primary text for this item
+          required: false
+        'alveo:annotations_url':
+          type: string
+          description: URL to access the annotations for this item
+          required: false
+        'alveo:documents':
+          type: array
+          description: list of documents associated with this item
+          items:
+              schema:
+                  '$ref': '#/definitions/DocumentMetadata'
+  DocumentMetadata:
+      type: object
+      properties:
+          'alveo:url':
+              type: string
+              description: the URL of the documents
+          'alveo:size':
+              type: string
+              description: human readable size for the document, eg. '3.8 kB'
+          'dc:identifier':
+              type: string
+              description: the document identifier, eg. '1-194-plain.txt'
+          'dc:extent':
+              type: string
+              description: size of the document in bytes
+  ItemInfo:
+    type: object
+    properties:
+      name:
+        type: string
+        description: The item list name
+      item_list_url:
+        type: string
+        description: The URL to access the item list
+      num_items:
+        type: integer
+        description: The number of items in the item list
+      shared:
+        type: boolean
+        description: true if the item list is shared with other users
+  ItemListQ:
+    type: object
+    properties:
+      items:
+        type: array
+        items:
+          type: string
+          description: Item URL
+      name:
+        type: string
+        description: Name of the item list to create - must be provided here or in the query string
+      num_results:
+        type: integer
+        description: size of the item list
+  ItemList:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Name of the item list to create - must be provided here or in the query string
+      num_items:
+        type: integer
+        description: size of the item list
+      items:
+        type: array
+        items:
+          type: string
+          description: Item URL
