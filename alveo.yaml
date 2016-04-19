@@ -48,24 +48,26 @@ paths:
           tags:
               - general
           summary: Get a list of licences available to the system
-      parameters:
-        - name: X-API-KEY
-          in: header
-          description: user API Key
-          required: true
-          type: string
-      responses:
-        '200':
-          description: A list of licences available
-          schema:
-              type: object
-              properties:
-                  name:
-                    description: licence name
-                    type: string
-                  id:
-                    description: item lists shared by other users
-                    type: string
+          parameters:
+            - name: X-API-KEY
+              in: header
+              description: user API Key
+              required: true
+              type: string
+          responses:
+            '200':
+              description: A list of licences available
+              schema:
+                  type: array
+                  items:
+                      type: object
+                      properties:
+                          name:
+                            description: licence name
+                            type: string
+                          id:
+                            description: item lists shared by other users
+                            type: string
 
   /item_lists:
     get:
