@@ -16,6 +16,8 @@ tags:
     description: Operations on Items
   - name: general
     description: General Operations
+  - name: collections
+    description: Operations on Collections
 paths:
   /version:
     get:
@@ -319,9 +321,90 @@ paths:
           summary: get the transfer spec to download this item list using Aspera Connect
   '/catalog':
       get:
+          tags:
+              - collections
           summary: get a list of collections
+          parameters:
+              - name: X-API-KEY
+                in: header
+                description: user API Key
+                required: true
+                type: string
+          responses:
+              '200':
+                  description: List of collections
+                  schema:
+                      type: object
+                      properties:
+                          num_collections:
+                              type: integer
+                          collections:
+                              type: array
+                              items:
+                                  type: string
+                                  description: Item URL
       post:
+          tags:
+              - collections
           summary: create a new collection
+          parameters:
+              - name: X-API-KEY
+                in: header
+                description: user API Key
+                required: true
+                type: string
+              - name: collection_name
+                in: url
+                description: Name for the collection, eg. ACE
+                required: false
+                type: string
+              - name: licence_id
+                in: url
+                description: Licence identifier (as per /licences)
+                required: false
+                type: string
+              - name: private
+                in: url
+                description: Is this a private collection (default true), if this is true then permission is required before a user can access the collection
+                required: false
+                type: boolean
+              - name: metadata
+                in: body
+                description: Collection level metadata assocated with this new collection, may also contains values for the other parameters (collection_name etc)
+                type: object
+                properties:
+                    collection_metadata:
+                        description: metadata to be associated with the collection
+                        type: object
+                        properties:
+                            '@context':
+                                type: string
+                                description: the JSON-LD context
+                            '@type':
+                                type: string
+                                description: should be "dcmitype:Collection"
+
+                    collection_name:
+                        type: string
+                    licence_id:
+                        type: string
+                    private:
+                        type: boolean
+          responses:
+            '200':
+                description: Success/failure message
+                schema:
+                    type: object
+                    properties:
+                      success:
+                        type: string
+                      error:
+                        type: string
+            '404':
+                description: Not found
+                schema:
+                    $ref: '#/definitions/NotFound'
+
   '/catalog/{collection_name}':
       get:
           summary: get the metadata for a collection
@@ -655,24 +738,22 @@ definitions:
         'alveo:metadata':
           type: object
           description: metadata properties for the item
-          schema:
-              type: object
-              properties:
-                'dc:identifier':
-                    type: string
-                    description: the item identifier, eg. '1-194'
-                'dc:created':
-                    type: string
-                    description: the creation date of the documents in the item
-                'alveo:display_document':
-                    type: string
-                    description: the identifier of the document that should be displayed for this item
-                'alveo:indexable_document':
-                    type: string
-                    description: the identifier of a document that can be indexed for full text search
-                'alveo:full_text':
-                    type: string
-                    description: the full text of the primary document (if available)
+          properties:
+            'dc:identifier':
+                type: string
+                description: the item identifier, eg. '1-194'
+            'dc:created':
+                type: string
+                description: the creation date of the documents in the item
+            'alveo:display_document':
+                type: string
+                description: the identifier of the document that should be displayed for this item
+            'alveo:indexable_document':
+                type: string
+                description: the identifier of a document that can be indexed for full text search
+            'alveo:full_text':
+                type: string
+                description: the full text of the primary document (if available)
         'alveo:primary_text_url':
           type: string
           description: URL to access the primary text for this item
@@ -685,8 +766,7 @@ definitions:
           type: array
           description: list of documents associated with this item
           items:
-              schema:
-                  '$ref': '#/definitions/DocumentMetadata'
+            '$ref': '#/definitions/DocumentMetadata'
   DocumentMetadata:
       type: object
       properties:
