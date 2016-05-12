@@ -417,11 +417,121 @@ paths:
           summary: search all collections for items using metadata properties
   '/catalog/{collection_name}/{item_id}':
       put:
-         summary: update the metadata for an item
+          summary: update the metadata for an item
+          tags:
+              - items
+          parameters:
+            - name: X-API-KEY
+              in: header
+              description: user API Key
+              required: true
+              type: string
+            - name: collection_name
+              in: path
+              description: collection name
+              required: true
+              type: string
+            - name: item_id
+              in: path
+              description: the item identifier
+              required: true
+              type: string
+            - name: metadata
+              in: body
+              type: string
+              description: updated metadata as JSON-LD
+          responses:
+              '200':
+                  description: success/error message
+                  schema:
+                    type: object
+                    properties:
+                      success:
+                        type: string
+                        description: success message
+                      error:
+                        type: string
+                        description: error message
       delete:
          summary: delete an item
+         tags:
+              - items
+         summary: Get item metadata
+         parameters:
+            - name: X-API-KEY
+              in: header
+              description: user API Key
+              required: true
+              type: string
+            - name: collection_name
+              in: path
+              description: collection name
+              required: true
+              type: string
+            - name: item_id
+              in: path
+              description: the item identifier
+              required: true
+              type: string
+         responses:
+              '200':
+                  description: success/error message
+                  schema:
+                    type: object
+                    properties:
+                      success:
+                        type: string
+                        description: success message
+                      error:
+                        type: string
+                        description: error message
       post:
+         tags:
+             - items
          summary: add a document to an item
+         parameters:
+            - name: X-API-KEY
+              in: header
+              description: user API Key
+              required: true
+              type: string
+            - name: collection_name
+              in: path
+              description: collection name
+              required: true
+              type: string
+            - name: item_id
+              in: path
+              description: the item identifier
+              required: true
+              type: string
+            - name: metadata
+              in: formData
+              required: true
+              type: object
+              properties:
+                  '@context':
+                      type: string
+                      description: the JSON-LD context
+                  '@id':
+                      type: string
+                      description: document identifier eg. document3.txt
+            - name: file
+              description: document file to be attached to item
+              in: formData
+              type: file
+         responses:
+            '200':
+              description: success/error message
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: string
+                    description: success message
+                  error:
+                    type: string
+                    description: error message
       get:
           tags:
               - items
