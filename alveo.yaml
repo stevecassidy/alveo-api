@@ -319,6 +319,9 @@ paths:
   '/item_lists/{id}/aspera_transfer_spec':
       post:
           summary: get the transfer spec to download this item list using Aspera Connect
+          responses:
+            '200':
+              description: "TODO"
   '/catalog':
       get:
           tags:
@@ -354,42 +357,43 @@ paths:
                 required: true
                 type: string
               - name: collection_name
-                in: url
+                in: query
                 description: Name for the collection, eg. ACE
                 required: false
                 type: string
               - name: licence_id
-                in: url
+                in: query
                 description: Licence identifier (as per /licences)
                 required: false
                 type: string
               - name: private
-                in: url
+                in: query
                 description: Is this a private collection (default true), if this is true then permission is required before a user can access the collection
                 required: false
-                type: boolean
+                type: string
               - name: metadata
                 in: body
                 description: Collection level metadata assocated with this new collection, may also contains values for the other parameters (collection_name etc)
-                type: object
-                properties:
-                    collection_metadata:
-                        description: metadata to be associated with the collection
-                        type: object
-                        properties:
-                            '@context':
-                                type: string
-                                description: the JSON-LD context
-                            '@type':
-                                type: string
-                                description: should be "dcmitype:Collection"
-
-                    collection_name:
-                        type: string
-                    licence_id:
-                        type: string
-                    private:
-                        type: boolean
+                schema:
+                  type: object
+                  properties:
+                      collection_metadata:
+                          description: metadata to be associated with the collection
+                          type: object
+                          properties:
+                              '@context':
+                                  type: string
+                                  description: the JSON-LD context
+                              '@type':
+                                  type: string
+                                  description: should be "dcmitype:Collection"
+  
+                      collection_name:
+                          type: string
+                      licence_id:
+                          type: string
+                      private:
+                          type: boolean
           responses:
             '200':
                 description: Success/failure message
@@ -408,13 +412,25 @@ paths:
   '/catalog/{collection_name}':
       get:
           summary: get the metadata for a collection
+          responses:
+            '200':
+              description: "TODO"
       post:
           summary: add items with documents to a collection
+          responses:
+            '200':
+              description: "TODO"
       put:
           summary: update the metadata for a collection
+          responses:
+            '200':
+              description: "TODO"
   '/catalog/search':
       get:
           summary: search all collections for items using metadata properties
+          responses:
+            '200':
+              description: "TODO"
   '/catalog/{collection_name}/{item_id}':
       put:
           summary: update the metadata for an item
@@ -438,8 +454,9 @@ paths:
               type: string
             - name: metadata
               in: body
-              type: string
-              description: updated metadata as JSON-LD
+              schema:
+                type: string
+                description: updated metadata as JSON-LD
           responses:
               '200':
                   description: success/error message
@@ -456,7 +473,6 @@ paths:
          summary: delete an item
          tags:
               - items
-         summary: Get item metadata
          parameters:
             - name: X-API-KEY
               in: header
@@ -506,16 +522,18 @@ paths:
               required: true
               type: string
             - name: metadata
-              in: formData
+              description: JSON metadata 
+              in: body
               required: true
-              type: object
-              properties:
-                  '@context':
-                      type: string
-                      description: the JSON-LD context
-                  '@id':
-                      type: string
-                      description: document identifier eg. document3.txt
+              schema:
+                type: object
+                properties:
+                    '@context':
+                        type: string
+                        description: the JSON-LD context
+                    '@id':
+                        type: string
+                        description: document identifier eg. document3.txt
             - name: file
               description: document file to be attached to item
               in: formData
@@ -561,6 +579,9 @@ paths:
   '/catalog/{collection_name}/{item_id}/document/{doc_id}':
       delete:
           summary: delete a document from an item
+          responses:
+            '200':
+              description: "TODO"
       get:
           tags:
               - items
@@ -798,6 +819,9 @@ paths:
   '/catalog/download_items':
       'post':
           summary: download item documents and metadata
+          responses:
+            '200':
+              description: "TODO"
 definitions:
   NotFound:
       type: object
@@ -867,11 +891,9 @@ definitions:
         'alveo:primary_text_url':
           type: string
           description: URL to access the primary text for this item
-          required: false
         'alveo:annotations_url':
           type: string
           description: URL to access the annotations for this item
-          required: false
         'alveo:documents':
           type: array
           description: list of documents associated with this item
